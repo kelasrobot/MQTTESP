@@ -12,7 +12,7 @@ void MQTTESP::begin() {
   _client.onMessage([this](String & topic, String & payload) {
     this->onMessage(topic, payload);
   });
-  connectMQTT(); // Memanggil fungsi connectMQTT di sini
+  connectMQTT();
 }
 
 void MQTTESP::loop() {
@@ -37,7 +37,6 @@ void MQTTESP::publish(String topic, String payload) {
     Serial.println("[MQTT]: Publish failed");
   }
 }
-
 
 void MQTTESP::publish(String topic, String payload, bool retained, int qos) {
   bool result = _client.publish(topic, payload, retained, qos);
@@ -104,10 +103,7 @@ void MQTTESP::connectWiFi() {
 }
 
 void MQTTESP::connectMQTT() {
-  // Generate a random client ID
-  String clientId = "mqttesp_client_id-" + String(random(0xffff), HEX);  // HEX ensures a hexadecimal random number
-
-  // Attempt to connect with the generated client ID
+  String clientId = "mqttesp_client_id-" + String(random(0xffff), HEX);
   if (_mqtt_user && _mqtt_pass) {
     while (!_client.connect(clientId.c_str(), _mqtt_user, _mqtt_pass)) {
       Serial.println("[MQTT]: Connecting to MQTT...");
@@ -122,14 +118,23 @@ void MQTTESP::connectMQTT() {
   Serial.println("[MQTT]: MQTT connected");
 }
 
-void MQTTESP::onMessageStatic(String &topic, String &payload) {
-  // Do nothing here, as we use the lambda function in begin()
+void MQTTESP::setWill(const char* topic, const char* payload, bool retained, int qos) {
+  _client.setWill(topic, payload, retained, qos);
+  Serial.println("[MQTT]: Last Will set");
+  Serial.println("[MQTT]: Topic: " + String(topic));
+  Serial.println("[MQTT]: Payload: " + String(payload));
+  Serial.println("[MQTT]: Retained: " + String(retained));
+  Serial.println("[MQTT]: QoS: " + String(qos));
+}
+
+void MQTTESP::clearWill() {
+  _client.clearWill();
+  Serial.println("[MQTT]: Last Will cleared");
 }
 
 void MQTTESP::onMessage(String &topic, String &payload) {
   setIncomingTopic(topic.c_str());
   setIncomingMessage(payload.c_str());
-
   Serial.print("[MQTT] Incoming Topic: ");
   Serial.println(_incomingTopic);
   Serial.print("[MQTT] Incoming Message: ");

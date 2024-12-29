@@ -19,13 +19,15 @@ class MQTTESP {
     void loop();
     bool isConnected();
     void publish(String topic, String payload);
-    void publish(String  topic, String payload, bool retained, int qos);
+    void publish(String topic, String payload, bool retained, int qos);
     void subscribe(const char* topic);
     void subscribe(const char* topic, int qos);
     const char* getIncomingTopic();
     const char* getIncomingMessage();
     void setIncomingTopic(const char* topic);
     void setIncomingMessage(const char* message);
+    void setWill(const char* topic, const char* payload, bool retained = false, int qos = 0);
+    void clearWill();
 
   private:
     const char* _ssid;
@@ -40,7 +42,7 @@ class MQTTESP {
     char _incomingMessage[100];
 
     void connectWiFi();
-    void connectMQTT(); // Deklarasi fungsi connectMQTT di sini
+    void connectMQTT();
     static void onMessageStatic(String &topic, String &payload);
     void onMessage(String &topic, String &payload);
 };
