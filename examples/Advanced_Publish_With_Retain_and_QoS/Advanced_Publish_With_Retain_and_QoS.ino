@@ -1,6 +1,6 @@
 #include <MQTTESP.h>
-const char* ssid = "isi dengan nama wifi";
-const char* password = "isi dengan password wifi";
+const char* ssid = "wifi_name";
+const char* password = "wifi_password";
 const char* mqtt_server = "broker.emqx.io";
 MQTTESP mqtt(ssid, password, mqtt_server);
 

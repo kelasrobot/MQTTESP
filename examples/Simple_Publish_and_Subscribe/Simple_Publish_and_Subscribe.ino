@@ -21,7 +21,8 @@ void loop() {
   
   if (millis() - timer >= intervalKirim) {
     timer = millis();
-    mqtt.publish(topicSensor, String(++counter)
+    mqtt.publish(topicSensor, String(++counter));
+  }
   
   String pesan = mqtt.getIncomingMessage();
   if (pesan != "") {
