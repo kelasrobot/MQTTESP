@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <WiFiClient.h>
 #include <MQTT.h>
+#include <vector>
 
 #if defined(ESP32)
 #include <WiFi.h>
@@ -26,15 +27,14 @@ class MQTTESP {
     void subscribe(const char* topic);
     void subscribe(const char* topic, int qos);
     
-    // Callback system
-    typedef void (*MQTTMessageCallback)(const char* topic, const char* payload);
-    void registerCallback(const char* topic, MQTTMessageCallback callback);
-
     // Methods for incoming messages and topics
     const char* getIncomingTopic();
     const char* getIncomingMessage();
-    void setIncomingTopic(const char* topic);
     void setIncomingMessage(const char* message);
+
+    // Debug control
+    void setDebug(bool enable);
+    bool getDebug();
 
   private:
     const char* _ssid;
@@ -43,6 +43,7 @@ class MQTTESP {
     const char* _mqtt_user;
     const char* _mqtt_pass;
     int _mqtt_port;
+    bool _debug;
     
     WiFiClient _net;
     MQTTClient _client;
@@ -51,21 +52,16 @@ class MQTTESP {
     char _incomingTopic[100];
     char _incomingMessage[100];
 
-    // Callback management
-    struct TopicCallback {
-        String topicPattern;
-        MQTTMessageCallback callback;
-    };
-    
-    static const int MAX_CALLBACKS = 5;
-    TopicCallback _callbacks[MAX_CALLBACKS];
-    int _callbackCount = 0;
+    // Simple subscription management
+    std::vector<String> _subscribedTopics;
 
     void connectWiFi();
     void connectMQTT();
-    static void onMessageStatic(String &topic, String &payload);
+    void resubscribeAll();
     void onMessage(String &topic, String &payload);
-    static bool topicMatches(const char* pattern, const char* topic);
+    
+    // Helper function for debug prints
+    void debugPrint(String message);
 };
 
 #endif
